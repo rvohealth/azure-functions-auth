@@ -8,4 +8,4 @@ metadata:
 spec:
   type: service # can be one of: service, library, website, event-driven-service, terraform-module, terraform-repo
   lifecycle: production # can be one of: experimental, production, deprecated
-  owner: unassigned # your existing tech team, i.e. team-developer-platforms
+  owner: team-quit-for-life # your existing tech team, i.e. team-developer-platforms
