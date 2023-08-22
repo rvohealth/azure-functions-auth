@@ -1,5 +1,5 @@
-import { Context, Logger } from "@azure/functions"
-import { TelemetryClient } from "applicationinsights"
+import { Context, Logger } from '@azure/functions';
+import { TelemetryClient } from 'applicationinsights';
 
 export interface JwtToken {
   iss?: string;
@@ -13,7 +13,7 @@ export interface JwtToken {
 }
 
 export interface AuthenticatedContext extends Context {
-  jwtToken: JwtToken
+  jwtToken: JwtToken;
 }
 
 export interface TokenValidationResponse {
@@ -32,7 +32,7 @@ export interface AuthorizeOptions {
   requiredIssuer: string;
   requiredAud: string;
   requiredRole?: string;
-  appInsightsClient?: TelemetryClient
+  appInsightsClient?: TelemetryClient;
 }
 
 export class TokenValidationError extends Error {

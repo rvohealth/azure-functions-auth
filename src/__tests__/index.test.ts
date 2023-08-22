@@ -3,45 +3,55 @@
 
 import { AuthorizeOptions, TokenValidationError } from '../types';
 
-import { requireAuthorization } from '../index';
+import { clearCache, requireAuthorization } from '../index';
 import { Context, HttpRequest, Logger } from '@azure/functions';
 import { mock } from 'jest-mock-extended';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 
-jest.mock('jose')
+jest.mock('jose');
 
-describe("azure-function-auth tests", () => {
+describe('azure-function-auth tests', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.clearAllMocks();
+    clearCache();
   });
 
-    it('authorize - Valid token calls handler once', async () => {
-        const handler = jest.fn(async (context: Context, req: HttpRequest, token: string) => {});
-        const options: AuthorizeOptions = {jwksEndpoint: "https://mock.optum.com", requiredIssuer: "", requiredAud: 'aud' };
+  it('authorize - Valid token calls handler once', async () => {
+    const handler = jest.fn(async (context: Context, req: HttpRequest, token: string) => {});
+    const options: AuthorizeOptions = {
+      jwksEndpoint: 'https://mock.optum.com',
+      requiredIssuer: '',
+      requiredAud: 'aud',
+    };
 
-        const wrapperHandler = requireAuthorization(handler, options);
+    const wrapperHandler = requireAuthorization(handler, options);
 
-        const request: HttpRequest = mock<HttpRequest>();
-        request.headers = {
-            authorization: 'Bearer Token',
-        };
+    const request: HttpRequest = mock<HttpRequest>();
+    request.headers = {
+      authorization: 'Bearer Token',
+    };
 
-        const context: Context = mock<Context>();
+    const context: Context = mock<Context>();
 
-        context.log = mock<Logger>();
+    context.log = mock<Logger>();
 
-        (createRemoteJWKSet as jest.Mock).mockReturnValue({});
+    (createRemoteJWKSet as jest.Mock).mockReturnValue({});
 
-        (jwtVerify as jest.Mock).mockReturnValue(Promise.resolve({}));
+    (jwtVerify as jest.Mock).mockReturnValue(Promise.resolve({}));
 
-        await wrapperHandler(context, request);
+    await wrapperHandler(context, request);
 
-        expect(handler).toBeCalled();
-    });
+    expect(handler).toBeCalled();
+  });
 
   it('authorize - Missing role returns 403', async () => {
     const handler = jest.fn(async (context: Context, req: HttpRequest, token: string) => {});
-    const options: AuthorizeOptions = {jwksEndpoint: "https://mock.optum.com", requiredIssuer: "", requiredAud: 'aud', requiredRole: 'role' };
+    const options: AuthorizeOptions = {
+      jwksEndpoint: 'https://mock.optum.com',
+      requiredIssuer: '',
+      requiredAud: 'aud',
+      requiredRole: 'role',
+    };
 
     const wrapperHandler = requireAuthorization(handler, options);
 
@@ -57,11 +67,11 @@ describe("azure-function-auth tests", () => {
     (createRemoteJWKSet as jest.Mock).mockReturnValue({});
 
     (jwtVerify as jest.Mock).mockReturnValue(
-        Promise.resolve({
-          payload: {
-            roles: ['something else'],
-          },
-        }),
+      Promise.resolve({
+        payload: {
+          roles: ['something else'],
+        },
+      }),
     );
 
     await wrapperHandler(context, request);
@@ -70,9 +80,14 @@ describe("azure-function-auth tests", () => {
     expect(context.res?.body.reason).toBe('Token does not contain required role');
   });
 
- it('authorize - Undefined role returns 403', async () => {
+  it('authorize - Undefined role returns 403', async () => {
     const handler = jest.fn(async (context: Context, req: HttpRequest, token: string) => {});
-    const options: AuthorizeOptions = {jwksEndpoint: "https://mock.optum.com", requiredIssuer: "", requiredAud: 'aud', requiredRole: 'role' };
+    const options: AuthorizeOptions = {
+      jwksEndpoint: 'https://mock.optum.com',
+      requiredIssuer: '',
+      requiredAud: 'aud',
+      requiredRole: 'role',
+    };
 
     const wrapperHandler = requireAuthorization(handler, options);
 
@@ -88,10 +103,9 @@ describe("azure-function-auth tests", () => {
     (createRemoteJWKSet as jest.Mock).mockReturnValue({});
 
     (jwtVerify as jest.Mock).mockReturnValue(
-        Promise.resolve({
-          payload: {
-          },
-        }),
+      Promise.resolve({
+        payload: {},
+      }),
     );
 
     await wrapperHandler(context, request);
@@ -102,7 +116,12 @@ describe("azure-function-auth tests", () => {
 
   it('authorize - Undefined roles returns 403', async () => {
     const handler = jest.fn(async (context: Context, req: HttpRequest, token: string) => {});
-    const options: AuthorizeOptions = {jwksEndpoint: "https://mock.optum.com", requiredIssuer: "", requiredAud: 'aud', requiredRole: 'role' };
+    const options: AuthorizeOptions = {
+      jwksEndpoint: 'https://mock.optum.com',
+      requiredIssuer: '',
+      requiredAud: 'aud',
+      requiredRole: 'role',
+    };
 
     const wrapperHandler = requireAuthorization(handler, options);
 
@@ -118,10 +137,10 @@ describe("azure-function-auth tests", () => {
     (createRemoteJWKSet as jest.Mock).mockReturnValue({});
 
     (jwtVerify as jest.Mock).mockReturnValue(
-        Promise.resolve({
-          payload: {},
-          roles: undefined,
-        }),
+      Promise.resolve({
+        payload: {},
+        roles: undefined,
+      }),
     );
 
     await wrapperHandler(context, request);
@@ -132,7 +151,12 @@ describe("azure-function-auth tests", () => {
 
   it('authorize - Invalid token returns 401', async () => {
     const handler = async (context: Context): Promise<void> => {};
-    const options: AuthorizeOptions = {jwksEndpoint: "https://mock.optum.com", requiredIssuer: "", requiredAud: 'aud', requiredRole: 'role' };
+    const options: AuthorizeOptions = {
+      jwksEndpoint: 'https://mock.optum.com',
+      requiredIssuer: '',
+      requiredAud: 'aud',
+      requiredRole: 'role',
+    };
 
     const wrapperHandler = requireAuthorization(handler, options);
 
@@ -157,7 +181,12 @@ describe("azure-function-auth tests", () => {
 
   it('authorize - Empty header returns 401', async () => {
     const handler = async (context: Context): Promise<void> => {};
-    const options: AuthorizeOptions = {jwksEndpoint: "https://mock.optum.com", requiredIssuer: "", requiredAud: 'aud', requiredRole: 'role' };
+    const options: AuthorizeOptions = {
+      jwksEndpoint: 'https://mock.optum.com',
+      requiredIssuer: '',
+      requiredAud: 'aud',
+      requiredRole: 'role',
+    };
 
     const wrapperHandler = requireAuthorization(handler, options);
 
@@ -178,7 +207,12 @@ describe("azure-function-auth tests", () => {
 
   it('authorize - Non-Bearer header returns 401', async () => {
     const handler = async (context: Context): Promise<void> => {};
-    const options: AuthorizeOptions = {jwksEndpoint: "https://mock.optum.com", requiredIssuer: "", requiredAud: 'aud', requiredRole: 'role' };
+    const options: AuthorizeOptions = {
+      jwksEndpoint: 'https://mock.optum.com',
+      requiredIssuer: '',
+      requiredAud: 'aud',
+      requiredRole: 'role',
+    };
 
     const wrapperHandler = requireAuthorization(handler, options);
 
@@ -199,13 +233,17 @@ describe("azure-function-auth tests", () => {
 
   it('authorize - undefined header returns 401', async () => {
     const handler = async (context: Context): Promise<void> => {};
-    const options: AuthorizeOptions = {jwksEndpoint: "https://mock.optum.com", requiredIssuer: "", requiredAud: 'aud', requiredRole: 'role' };
+    const options: AuthorizeOptions = {
+      jwksEndpoint: 'https://mock.optum.com',
+      requiredIssuer: '',
+      requiredAud: 'aud',
+      requiredRole: 'role',
+    };
 
     const wrapperHandler = requireAuthorization(handler, options);
 
     const request: HttpRequest = mock<HttpRequest>();
-    request.headers = {
-    };
+    request.headers = {};
 
     const context: Context = mock<Context>();
 
@@ -219,7 +257,12 @@ describe("azure-function-auth tests", () => {
 
   it('authorize - JWKS error throws error', async () => {
     const handler = async (context: Context): Promise<void> => {};
-    const options: AuthorizeOptions = {jwksEndpoint: "https://mock.optum.com", requiredIssuer: "", requiredAud: 'aud', requiredRole: 'role' };
+    const options: AuthorizeOptions = {
+      jwksEndpoint: 'https://mock.optum.com',
+      requiredIssuer: '',
+      requiredAud: 'aud',
+      requiredRole: 'role',
+    };
 
     const wrapperHandler = requireAuthorization(handler, options);
 
@@ -239,4 +282,4 @@ describe("azure-function-auth tests", () => {
 
     await expect(wrapperHandler(context, request)).rejects.toEqual(error);
   });
-})
+});

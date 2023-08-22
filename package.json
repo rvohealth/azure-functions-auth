@@ -1,6 +1,6 @@
 {
   "name": "Optum/azure-functions-auth",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "a middleware library for securing Azure functions using OAuth2/JWT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,8 +29,8 @@
     }
   ],
   "devDependencies": {
-    "@types/jest": "^26.0.23",
-    "@types/node": "^15.6.1",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.0.0",
     "@types/node-jose": "^1.1.10",
     "husky": "^6.0.0",
     "jest": "^27.0.1",
@@ -44,7 +44,7 @@
   "dependencies": {
     "@azure/functions": "^1.2.3",
     "applicationinsights": "^2.2.0",
-    "jose": "^4.1.4",
-    "node-jose": "^2.1.1"
+    "jose": "^4.14.4",
+    "node-jose": "^2.2.0"
   }
 }
